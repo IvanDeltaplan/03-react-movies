@@ -1,7 +1,7 @@
 import axios from "axios";
 import type { AxiosRequestConfig, AxiosResponse } from "axios";
 
-import type { Movie } from "../components/types/movie"; 
+import type { Movie } from "../types/movie"; 
 
 /** Тип відповіді TMDB */
 export interface TMDBResponse {
