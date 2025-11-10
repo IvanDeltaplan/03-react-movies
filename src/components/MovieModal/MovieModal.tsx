@@ -16,8 +16,8 @@ export default function MovieModal({ movie, onClose }: MovieModalProps) {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
 
-  const poster = movie.poster_path
-    ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+  const poster = movie.backdrop_path
+    ? `https://image.tmdb.org/t/p/w500${movie.backdrop_path}`
     : "/no-poster.png";
 
   return (
