@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import type { Movie } from "../../types/movie";
 import css from "./MovieModal.module.css";
 
@@ -8,6 +9,7 @@ interface MovieModalProps {
 }
 
 export default function MovieModal({ movie, onClose }: MovieModalProps) {
+  // Закриття по ESC
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -16,11 +18,23 @@ export default function MovieModal({ movie, onClose }: MovieModalProps) {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
 
-  const poster = movie.backdrop_path
-    ? `https://image.tmdb.org/t/p/w500${movie.backdrop_path}`
-    : "/no-poster.png";
+  // Блокування прокрутки сторінки
+  useEffect(() => {
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, []);
 
-  return (
+  const imageUrl =
+    movie.backdrop_path
+      ? `https://image.tmdb.org/t/p/w780${movie.backdrop_path}`
+      : movie.poster_path
+      ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+      : "/no-poster.png";
+
+  return createPortal(
     <div
       className={css.backdrop}
       onClick={(e) => {
@@ -36,7 +50,7 @@ export default function MovieModal({ movie, onClose }: MovieModalProps) {
           ×
         </button>
 
-        <img className={css.image} src={poster} alt={movie.title} />
+        <img className={css.image} src={imageUrl} alt={movie.title} />
 
         <div className={`${css.content} ${css.scrollbar}`}>
           <h2>{movie.title}</h2>
@@ -45,14 +59,15 @@ export default function MovieModal({ movie, onClose }: MovieModalProps) {
             {movie.release_date ? movie.release_date.slice(0, 4) : "N/A"}
           </p>
           <p>
-            <strong>Rating:</strong> ⭐{" "}
+            <strong>Rating:</strong>{" "}
             {typeof movie.vote_average === "number"
-              ? movie.vote_average.toFixed(1)
+              ? `⭐ ${movie.vote_average.toFixed(1)}`
               : "—"}
           </p>
           <p>{movie.overview || "No overview available."}</p>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
